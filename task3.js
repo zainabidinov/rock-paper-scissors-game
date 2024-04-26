@@ -1,5 +1,6 @@
 const readlineSync = require("readline-sync");
 const crypto = require("crypto");
+const { exit, argv } = require('node:process');
 
 class KeyGenerator {
   generateKey() {
@@ -60,10 +61,10 @@ class GameEngine {
   }
 
   startGame() {
-    console.log("Welcome!");
 
     while (true) {
       const moves = this.getUserMoves();
+      console.log("Welcome!");
       this.computerMove = new ComputerMove(moves);
       this.rules = new Rules(moves);
       const key = this.keyGenerator.generateKey();
@@ -83,18 +84,18 @@ class GameEngine {
   getUserMoves() {
     let moves;
     while (true) {
-      moves = readlineSync.question("Enter your moves: ").trim().split(/\s+/);
+      moves = argv.slice(2);
 
       if (moves.length % 2 === 0 || moves.length < 3) {
         console.log("Please enter an odd number of moves starting from 3.");
-        continue;
+        exit(1);
       }
 
       const uniqueMoves = new Set(moves);
 
       if (uniqueMoves.size !== moves.length) {
         console.log("Please enter unique moves without repetition.");
-        continue;
+        exit(1);
       }
 
       break;
@@ -108,7 +109,7 @@ class GameEngine {
         `Enter your move from 1 to ${this.computerMove.moves.length} (0 for Exit, ? for Help): `
       );
       if (moveIndex === "0" || moveIndex.toLowerCase() === "exit") {
-        process.exit();
+        exit(0);
       } else if (moveIndex === "?") {
         this.generateAndDisplayGameTable();
         console.log("HMAC:", hmac);
